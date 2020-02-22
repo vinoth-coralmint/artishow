@@ -18,3 +18,7 @@ Route::get('/', function () {
 
 Route::get('ical', 'IcalController@index')->name('ical');
 Route::get('ical/sync', 'IcalController@autoSync')->name('autoSync');
+
+// Artishow woo-commerce (Rename the route and controller as per your wish)
+Route::get('woo-commerce', 'WooCommerceController@index');
+Route::get('woo-commerce/sync', 'WooCommerceController@autoSync');

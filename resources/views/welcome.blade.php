@@ -80,7 +80,9 @@
             @endif
 
             <div class="content">
-            <a href='{{ route("ical") }}'>ICal</a>
+                <div class="row">
+                    <a href='{{ route("ical") }}'>ICal</a> |  <a href='{{ url("woo-commerce") }}'>WooCommerce</a>
+                </div>
                 <div class="title m-b-md">
                     Laravel
                 </div>
