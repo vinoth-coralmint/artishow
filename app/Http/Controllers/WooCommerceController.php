@@ -96,14 +96,28 @@ class WooCommerceController extends Controller
      */
     public function autoSync() {
         try{
-            $orders_details = Woocommerce::get('orders');   
+            $lastInsertId = DB::table('event_reservation')->orderBy('event_reservation_id', 'desc')->first();
+            if ($lastInsertId) {
+                $data = [
+                    'per_page'=> 100,
+                    'page' => 1,
+                    // 'before' => ($lastInsertId) ? $lastInsertId->reservation_date.'T00:00:00' : date('Y-m-d')."T00:00:00"
+                    'after' => ($lastInsertId) ? $lastInsertId->reservation_date.'T00:00:00' : date('Y-m-d')."T00:00:00"
+                ];
+            } else {
+                $data = [
+                    'per_page'=> 100,
+                    'page' => 1,
+                ];
+            }
+            $orders_details = Woocommerce::get('orders', $data);  
             foreach($orders_details as $order) {
                 $response  = $this->wooCommerceOrderDetails($order);
             }
         } catch (ModelNotFoundException $exception) {
             return back()->withError($exception->getMessage());
         }
-        echo 'Successfully Sync with tables';
+        echo count($orders_details). ' of new records are successfully sync with tables' ;
     }
 
     /**
@@ -133,10 +147,10 @@ class WooCommerceController extends Controller
                     'total_discount'        => $order['discount_total'],
                     'reservation_confirmed_status' => $order['status'],
                     'reservation_date'      => date('Y-m-d', strtotime($order['date_created'])),
-                    'reservation_via'       => 'online'
+                    'reservation_via'       => 'online',
+                    'reservation_id'        => $order['id']
                 ],
                 [
-                    'reservation_id'        => $order['id'],
                     'status'                => 1
                 ]
             );
@@ -187,7 +201,7 @@ class WooCommerceController extends Controller
                 'payment_reference'       => $order['transaction_id'],
                 'payment_date'            => date('Y-m-d', strtotime($order['date_paid']))    
             ],
-                ['status'                 => 0]
+                ['status'                 => 0 ]
             );
         } catch(ModelNotFoundException $exception) {
             return back()->withError($exception->getMessage());
